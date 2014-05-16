@@ -1,0 +1,10 @@
+# TODO: write description
+
+#
+DISK_NAME=/dev/mmcblk0
+
+#
+BACKUP_DIRECTORY=
+
+# Comma separated values
+#SERVICES=

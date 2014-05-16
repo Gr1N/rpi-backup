@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+# Include script defaults if available
+test -f /etc/default/rpi-backup && . /etc/default/rpi-backup
+
+
+function backup {
+    echo "Starting RaspberryPi backup process!"
+    echo
+
+    if [ ! -d "$BACKUP_DIRECTORY" ]; then
+        echo "Backup directory $BACKUP_DIRECTORY doesn't exist, creating it now!"
+        mkdir -p $BACKUP_DIRECTORY
+    fi
+
+    echo "Sync disks"
+    sync; sync
+
+    echo "Stop some services before starting backup process"
+    run_service_command stop
+
+    echo
+
+    local OFILE="$BACKUP_DIRECTORY/backup_$(date +%Y%m%d_%H%M%S)"
+
+    backup_card $OFILE
+    local BACKUP_RESULT=$?
+
+    echo "Start some services"
+    run_service_command start
+
+    process_backup_result $BACKUP_RESULT $OFILE
+    return $?
+}
+
+
+function run_service_command {
+    local COMMAND=$1
+    IFS=',' read -ra SERVICES_ARR <<< "$SERVICES"
+    for SERVICE_NAME in "${SERVICES_ARR[@]}"; do
+        service $SERVICE_NAME $COMMAND
+    done
+}
+
+
+function backup_card {
+    local OFILE=$1
+
+    echo "Backup SD card to img file $OFILE"
+    local SDSIZE=`blockdev --getsize64 $DISK_NAME`
+    pv -tpreb $DISK_NAME -s $SDSIZE | dd of=$OFILE bs=1M conv=sync,noerror iflag=fullblock
+
+    return $?
+}
+
+
+function process_backup_result {
+    local BACKUP_RESULT=$1
+    local OFILE=$2
+    local OFILEFINAL=$OFILE.img
+
+    if [ $BACKUP_RESULT -eq 1 ]; then
+        echo "Backup completed!"
+        mv $OFILE $OFILEFINAL
+        return 0
+    else
+        echo 'Backup failed!'
+        rm -f $OFILE
+        return 1
+    fi
+}
+
+
+backup
