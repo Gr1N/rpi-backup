@@ -59,7 +59,7 @@ function process_backup_result {
     local OFILE=$2
     local OFILEFINAL=$OFILE.img
 
-    if [ $BACKUP_RESULT -eq 1 ]; then
+    if [ $BACKUP_RESULT -eq 0 ]; then
         echo "Backup completed!"
         mv $OFILE $OFILEFINAL
         return 0
