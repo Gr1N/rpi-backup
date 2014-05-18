@@ -1,10 +1,12 @@
-# TODO: write description
-
+# rpi-backup script options
+# Uncomment and modify lines to change defaults
 #
+
+# Disk for which you want to backup
 DISK_NAME=/dev/mmcblk0
 
-#
+# Directory where to save backups
 BACKUP_DIRECTORY=
 
-# Comma separated values
-#SERVICES=
+# Some services which you want to stop while backup in process (comma separated values)
+# SERVICES=
