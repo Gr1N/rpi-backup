@@ -35,7 +35,7 @@ Daemonize
 
 ```
 % crontab -e
-% 00 00 * * * /usr/local/bin/rpi-backup > /var/log/cron.log 2>&1
+00 00 * * * /usr/local/bin/rpi-backup > /var/log/cron.log 2>&1
 ```
 
 
